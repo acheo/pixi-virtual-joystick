@@ -1,9 +1,3 @@
-var JoystickChangeEvent = {
-  angle: 0,
-  direction: 'left',
-  power: 0
-}
-
 var Direction = {
   LEFT : 'left',
   TOP : 'top',
