@@ -1,16 +1,11 @@
-declare var require: any; // parcel/typescript workaround.
-
-import * as PIXI from "pixi.js";
-import { Joystick } from "../src/";
-
 PIXI.Loader.shared
-  .add('outer', require("./images/joystick.png")) // require = get parcel's url
-  .add('inner', require("./images/joystick-handle.png")) // require = get parcel's url
+  .add('outer', "./images/joystick.png") 
+  .add('inner', "./images/joystick-handle.png")
   .load(initialize);
 
 function initialize() {
   const app = new PIXI.Application({
-    view: document.getElementById('canvas') as HTMLCanvasElement,
+    view: document.getElementById('canvas'),
     backgroundColor: 0xffffff,
     autoDensity: true,
     resolution: window.devicePixelRatio,
@@ -30,8 +25,6 @@ function initialize() {
   app.stage.addChild(leftJoystick);
 
   const rightJoystick = new Joystick({
-    // outer: PIXI.Sprite.from('outer'),
-    // inner: PIXI.Sprite.from('inner'),
     onChange: (data) => { rightText.text = JSON.stringify(data); },
     onStart: () => console.log('start'),
     onEnd: () => console.log('end'),
@@ -53,4 +46,5 @@ function initialize() {
   window.addEventListener('resize', resize);
 
   app.start();
+  
 }

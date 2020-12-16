@@ -1,45 +1,41 @@
-import * as PIXI from "pixi.js";
-
-export interface JoystickChangeEvent {
-  angle: number;
-  direction: Direction;
-  power: number;
+var JoystickChangeEvent = {
+  angle: 0,
+  direction: 'left',
+  power: 0
 }
 
-export enum Direction {
-  LEFT = 'left',
-  TOP = 'top',
-  BOTTOM = 'bottom',
-  RIGHT = 'right',
-  TOP_LEFT = 'top_left',
-  TOP_RIGHT = 'top_right',
-  BOTTOM_LEFT = 'bottom_left',
-  BOTTOM_RIGHT = 'bottom_right',
+var Direction = {
+  LEFT : 'left',
+  TOP : 'top',
+  BOTTOM : 'bottom',
+  RIGHT : 'right',
+  TOP_LEFT : 'top_left',
+  TOP_RIGHT : 'top_right',
+  BOTTOM_LEFT : 'bottom_left',
+  BOTTOM_RIGHT : 'bottom_right',
 }
 
-export interface JoystickSettings {
-  outer?: PIXI.Sprite | PIXI.Graphics | PIXI.Container,
-  inner?: PIXI.Sprite | PIXI.Graphics | PIXI.Container,
-  outerScale?: { x: number, y: number },
-  innerScale?: { x: number, y: number },
-  onChange?: (data: JoystickChangeEvent) => void;
-  onStart?: () => void;
-  onEnd?: () => void;
+class JoystickSettings {
+	
+	constructor(){
+		this.outer=null;
+		this.inner=null;
+		this.outerScale = { x: 1, y: 1 };
+		this.innerScale = { x: 1, y: 1 };
+		this.onChange = null;
+		this.onStart = null;
+		this.onEnd = null;
+	}
 }
 
-export class Joystick extends PIXI.Container {
-  settings: JoystickSettings;
-
-  outerRadius: number = 0;
-  innerRadius: number = 0;
-
-  outer!: PIXI.Sprite | PIXI.Graphics | PIXI.Container;
-  inner!: PIXI.Sprite | PIXI.Graphics | PIXI.Container;
+class Joystick extends PIXI.Container {
 
   innerAlphaStandby = 0.5;
 
-  constructor(opts: JoystickSettings) {
+  constructor(opts) {
     super();
+	
+	this.settings = new JoystickSettings();
 
     this.settings = Object.assign({
       outerScale: { x: 1, y: 1 },
@@ -66,11 +62,11 @@ export class Joystick extends PIXI.Container {
   }
 
   initialize() {
-    this.outer = this.settings.outer!;
-    this.inner = this.settings.inner!;
+    this.outer = this.settings.outer;
+    this.inner = this.settings.inner;
 
-    this.outer.scale.set(this.settings.outerScale!.x, this.settings.outerScale!.y);
-    this.inner.scale.set(this.settings.innerScale!.x, this.settings.innerScale!.y);
+    this.outer.scale.set(this.settings.outerScale.x, this.settings.outerScale.y);
+    this.inner.scale.set(this.settings.innerScale.x, this.settings.innerScale.y);
 
     if ('anchor' in this.outer) { this.outer.anchor.set(0.5); }
     if ('anchor' in this.inner) { this.inner.anchor.set(0.5); }
@@ -85,16 +81,16 @@ export class Joystick extends PIXI.Container {
     this.bindEvents();
   }
 
-  protected bindEvents() {
+  bindEvents() {
     let that = this;
     this.interactive = true;
 
-    let dragging: boolean = false;
-    let eventData: PIXI.InteractionData;
-    let power: number;
-    let startPosition: PIXI.Point;
+    let dragging = false;
+    let eventData;
+    let power;
+    let startPosition;
 
-    function onDragStart(event: PIXI.InteractionEvent) {
+    function onDragStart(event) {
       eventData = event.data;
       startPosition = eventData.getLocalPosition(that);
 
@@ -104,7 +100,7 @@ export class Joystick extends PIXI.Container {
       that.settings.onStart?.();
     }
 
-    function onDragEnd(event: PIXI.InteractionEvent) {
+    function onDragEnd(event) {
       if (dragging == false) { return; }
 
       that.inner.position.set(0, 0);
@@ -115,7 +111,7 @@ export class Joystick extends PIXI.Container {
       that.settings.onEnd?.();
     }
 
-    function onDragMove(event: PIXI.InteractionEvent) {
+    function onDragMove(event) {
       if (dragging == false) { return; }
 
       let newPosition = eventData.getLocalPosition(that);
@@ -238,13 +234,13 @@ export class Joystick extends PIXI.Container {
       .on('pointermove', onDragMove)
   }
 
-  protected getPower(centerPoint: PIXI.Point) {
+  getPower(centerPoint) {
     const a = centerPoint.x - 0;
     const b = centerPoint.y - 0;
     return Math.min(1, Math.sqrt(a * a + b * b) / this.outerRadius);
   }
 
-  protected getDirection(center: PIXI.Point) {
+  getDirection(center) {
     let rad = Math.atan2(center.y, center.x);// [-PI, PI]
     if ((rad >= -Math.PI / 8 && rad < 0) || (rad >= 0 && rad < Math.PI / 8)) {
       return Direction.RIGHT;
