@@ -1,8 +1,12 @@
-# 🕹 pixi-virtual-joystick
+# 🕹 pixi-virtual-joystick (Vanilla JS version)
 
 Virtual Touch Joystick for [pixi.js](https://github.com/pixijs/pixi.js)
 
 <img src="screenshot.gif?raw=1" />
+
+## Demo
+
+http://unitedcommand.com/apps/vjs/
 
 ## Usage
 
